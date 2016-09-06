@@ -15,7 +15,7 @@
  */
 
 /**
- * jquery-fn 1.0.0-alpha.2
+ * jquery-fn 1.0.0-beta.1
  * @author Stefan Wimmer <stefanwimmer128@gmail.com>
  */
 
@@ -58,7 +58,29 @@
                 if (! x.done)
                     x.value.then(value => parse(itr.next(value)));
             })(itr.next());
-        }
+        },
+        
+        mapKey: key => $fn.map(x => x[key]),
+        
+        curry: (fn) => function curry(arg, args = [])
+        {
+            args.push(arg);
+            
+            if (args.length == fn.length)
+                return fn(...args);
+            
+            return arg => curry(arg, args);
+        },
+        
+        uncurry: (fn) => (...args) =>
+        {
+            let val = fn;
+            
+            for (const arg of args)
+                val = val(arg);
+            
+            return val;
+        },
     });
     
     $.$fn = $fn;
