@@ -15,7 +15,7 @@
  */
 
 /**
- * jquery-fn 1.0.0-alpha.1
+ * jquery-fn 1.0.0-alpha.2
  * @author Stefan Wimmer <stefanwimmer128@gmail.com>
  */
 
@@ -24,7 +24,7 @@
     if ($ === undefined)
         return ;
     
-    let $fn = $.$fn || {};
+    const $fn = $.$fn || {};
     
     Object.assign($fn, {
         global: () => window.$fn = $fn,
@@ -55,10 +55,8 @@
             
             (function parse(x)
             {
-                if (x.done)
-                    return ;
-                
-                x.value.then(value => parse(itr.next(value)));
+                if (! x.done)
+                    x.value.then(value => parse(itr.next(value)));
             })(itr.next());
         }
     });
