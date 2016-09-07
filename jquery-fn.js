@@ -15,19 +15,17 @@
  */
 
 /**
- * jquery-fn 1.0.0-beta.1
+ * jquery-fn 1.0.0-beta.2
  * @author Stefan Wimmer <stefanwimmer128@gmail.com>
  */
 
 ($ =>
 {
-    if ($ === undefined)
-        return ;
-    
-    const $fn = $.$fn || {};
+    const root = this,
+        $fn = $.$fn || {};
     
     Object.assign($fn, {
-        global: () => window.$fn = $fn,
+        global: () => root.$fn = $fn,
         
         invert: fn => (...args) => ! fn(...args),
         
@@ -62,6 +60,8 @@
         
         mapKey: key => $fn.map(x => x[key]),
         
+        sum: (...args) => args.reduce((sum, arg) => sum + arg, 0),
+        
         curry: (fn) => function curry(arg, args = [])
         {
             args.push(arg);
@@ -84,4 +84,4 @@
     });
     
     $.$fn = $fn;
-})(typeof jQuery !== "undefined" ? jQuery : console.log("No global jQuery object detected!"));
+})(jQuery);
