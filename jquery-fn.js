@@ -15,73 +15,105 @@
  */
 
 /**
- * jquery-fn 1.0.0-beta.2
+ * jquery-fn 1.0.0-rc.1
  * @author Stefan Wimmer <stefanwimmer128@gmail.com>
  */
 
-($ =>
+(($, global) =>
 {
-    const root = this,
-        $fn = $.$fn || {};
+    const $fn = $.$fn || {};
     
     Object.assign($fn, {
-        global: () => root.$fn = $fn,
+        global: () =>
+            global.$fn = $fn,
         
-        invert: fn => (...args) => ! fn(...args),
+        invert: fn =>
+            (...args) =>
+                ! fn(...args),
         
-        each: fn => array => array.forEach(fn),
+        each: fn =>
+            array =>
+                array.forEach(fn),
         
-        map: fn => array => array.map(fn),
+        map: fn =>
+            array =>
+                array.map(fn),
         
-        filter: fn => array => array.filter(fn),
+        filter: fn =>
+            array =>
+                array.filter(fn),
         
-        reject: fn => array => array.filter($fn.invert(fn)),
+        reject: fn =>
+            array =>
+                array.filter($fn.invert(fn)),
         
-        find: fn => array => array.find(fn),
+        find: fn =>
+            array =>
+                array.find(fn),
         
-        reduce: (fn, start0) => (array, start1 = start0) => array.reduce(fn, start1),
+        reduce: (fn, start0) =>
+            (array, start1 = start0) =>
+                array.reduce(fn, start1),
         
-        some: fn => array => array.some(fn),
+        some: fn =>
+            array =>
+                array.some(fn),
         
-        every: fn => array => array.every(fn),
+        every: fn =>
+            array =>
+                array.every(fn),
         
-        sort: fn => array => array.sort(fn),
+        sort: fn =>
+            array =>
+                array.sort(fn),
         
-        resolve: (generator) =>
+        resolve: gen =>
         {
-            const itr = generator();
+            const itr = gen();
             
-            (function parse(x)
+            (function resolve(x)
             {
                 if (! x.done)
-                    x.value.then(value => parse(itr.next(value)));
+                    x.value.then(value =>
+                        resolve(itr.next(value))
+                    );
             })(itr.next());
         },
         
-        mapKey: key => $fn.map(x => x[key]),
+        mapKey: key =>
+            $fn.map(x =>
+                x[key]
+            ),
         
-        sum: (...args) => args.reduce((sum, arg) => sum + arg, 0),
+        sum: (...args) =>
+            args.reduce((sum, arg) =>
+                Array.isArray(arg) ? sum + $fn.sum(...arg) : sum + arg, 0
+            ),
         
-        curry: (fn) => function curry(arg, args = [])
-        {
-            args.push(arg);
-            
-            if (args.length == fn.length)
-                return fn(...args);
-            
-            return arg => curry(arg, args);
-        },
+        curry: (fn, n) =>
+            (arg, args = []) =>
+            {
+                args.push(arg);
+                
+                return args.length === (n || fn.length)
+                    ? fn(...args)
+                    : arg => $fn.curry(fn, n)(arg, args);
+            },
         
-        uncurry: (fn) => (...args) =>
-        {
-            let val = fn;
-            
-            for (const arg of args)
-                val = val(arg);
-            
-            return val;
-        },
+        uncurry: fn =>
+            (...args) =>
+            {
+                let val = fn;
+                
+                for (const arg of args)
+                    val = val(arg);
+                
+                return val;
+            },
+        
+        extend: (obj, override = false) =>
+            Object.assign($fn, override ? obj : Object.assign(obj, $fn)),
     });
     
     $.$fn = $fn;
-})(jQuery);
+})(jQuery, this);
